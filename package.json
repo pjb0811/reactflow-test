@@ -12,13 +12,15 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@tisoap/react-flow-smart-edge": "^3.0.0",
     "dagre": "^0.8.5",
     "elkjs": "^0.8.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "reactflow": "^11.7.2"
+    "reactflow": "^11.10.1"
   },
   "devDependencies": {
+    "@dagrejs/dagre": "^1.0.2",
     "@storybook/addon-essentials": "^7.0.17",
     "@storybook/addon-interactions": "^7.0.17",
     "@storybook/addon-links": "^7.0.17",

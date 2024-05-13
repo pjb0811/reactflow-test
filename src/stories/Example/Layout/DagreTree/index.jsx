@@ -5,8 +5,17 @@ import ReactFlow, {
   Panel,
   useNodesState,
   useEdgesState,
+  getSmoothStepPath,
+  BaseEdge,
+  useNodes,
 } from 'reactflow';
 import dagre from 'dagre';
+import {
+  SmartStepEdge,
+  getSmartEdge,
+  SmartStraightEdge,
+  SmartBezierEdge,
+} from '@tisoap/react-flow-smart-edge';
 
 import { initialNodes, initialEdges } from './nodes-edges.js';
 
@@ -18,9 +27,61 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 172;
 const nodeHeight = 36;
 
+// const foreignObjectSize = 200;
+
+// { id, ...props }
+const CustomEdge = props => {
+  const nodes = useNodes();
+
+  const getSmartEdgeResponse = getSmartEdge({
+    ...props,
+    nodes,
+  });
+
+  if (!getSmartEdgeResponse) {
+    return <SmartStepEdge {...props} />;
+  }
+
+  return <SmartStepEdge {...props} />;
+  /* const { edgeCenterX, edgeCenterY, svgPathString } = getSmartEdgeResponse;
+
+  return (
+    <>
+      <path
+        style={props.style}
+        className="react-flow__edge-path"
+        d={svgPathString}
+        markerEnd={props.markerEnd}
+        markerStart={props.markerStart}
+      />
+      <foreignObject
+        width={foreignObjectSize}
+        height={foreignObjectSize}
+        x={edgeCenterX - foreignObjectSize / 2}
+        y={edgeCenterY - foreignObjectSize / 2}
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <button
+          onClick={event => {
+            event.stopPropagation();
+            alert(`remove ${props.id}`);
+          }}
+        >
+          X
+        </button>
+      </foreignObject>
+    </>
+  ); */
+};
+
+const edgeTypes = {
+  // custom: SmartStepEdge,
+  custom: CustomEdge,
+};
+
 const getLayoutedElements = (nodes, edges, direction = 'TB') => {
   const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction });
+  dagreGraph.setGraph({ rankdir: direction, nodesep: 200, ranksep: 200 });
 
   nodes.forEach(node => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -63,11 +124,12 @@ const LayoutFlow = () => {
     params =>
       setEdges(eds =>
         addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
+          // { ...params, type: ConnectionLineType.SmoothStep, animated: true },
+          { ...params, type: 'custom', animated: true },
           eds,
         ),
       ),
-    [],
+    [setEdges],
   );
   const onLayout = useCallback(
     direction => {
@@ -77,7 +139,7 @@ const LayoutFlow = () => {
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
     },
-    [nodes, edges],
+    [nodes, edges, setNodes, setEdges],
   );
 
   return (
@@ -87,8 +149,9 @@ const LayoutFlow = () => {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      connectionLineType={ConnectionLineType.SmoothStep}
+      // connectionLineType={ConnectionLineType.SmoothStep}
       fitView
+      edgeTypes={edgeTypes}
     >
       <Panel position="top-right">
         <button onClick={() => onLayout('TB')}>vertical layout</button>

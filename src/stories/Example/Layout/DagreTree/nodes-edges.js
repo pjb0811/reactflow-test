@@ -1,5 +1,5 @@
 const position = { x: 0, y: 0 };
-const edgeType = 'smoothstep';
+const edgeType = 'custom';
 
 export const initialNodes = [
   {
